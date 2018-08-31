@@ -1,0 +1,94 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+
+<sqlMap namespace="Person" xmlns="http://ibatis.apache.org/mapping" 
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" >
+
+  <alias>
+    <typeAlias alias="Person" type="Service.Model.Person,Service.Model" />
+  </alias>
+  
+  <resultMaps>
+    <resultMap id="SelectAllResult" class="Person">
+      <result property="Id" column="PER_ID" />
+      <result property="FirstName" column="PER_FIRST_NAME" />
+      <result property="LastName" column="PER_LAST_NAME" />
+      <result property="BirthDate" column="PER_BIRTH_DATE" />
+      <result property="WeightInKilograms" column="PER_WEIGHT_KG" />
+      <result property="HeightInMeters" column="PER_HEIGHT_M" />
+    </resultMap>
+  </resultMaps>
+
+  <statements>
+    <select id="SelectAllPerson" resultMap="SelectAllResult">
+      select
+      PER_ID,
+      PER_FIRST_NAME,
+      PER_LAST_NAME,
+      PER_BIRTH_DATE,
+      PER_WEIGHT_KG,
+      PER_HEIGHT_M
+      from PERSON
+    </select>
+
+      <select id="SelectAllPerson2" resultMap="SelectAllResult">
+          select
+          PER_ID AS Id,
+          PER_FIRST_NAME AS FirstName,
+          PER_LAST_NAME AS LastName,
+          PER_BIRTH_DATE AS BirthDate,
+          PER_WEIGHT_KG AS WeightInKilograms,
+          PER_HEIGHT_M AS HeightInMeters
+          from PERSON
+          <dynamic prepend="WHERE">
+              <isParameterPresent>
+                  PER_FIRST_NAME LIKE #FirstName#+'%'
+              </isParameterPresent>
+          </dynamic>
+      </select>
+
+    <select id="SelectByPersonId" resultClass="Person" parameterClass="int">
+      select
+      PER_ID,
+      PER_FIRST_NAME,
+      PER_LAST_NAME,
+      PER_BIRTH_DATE,
+      PER_WEIGHT_KG,
+      PER_HEIGHT_M
+      from PERSON
+      where PER_ID = #value#
+    </select>
+    
+    <insert id="InsertPerson"  parameterclass="Person" >
+      <selectKey property="Id" type="post" resultClass="int">
+        ${selectKey}
+      </selectKey>	
+      insert into Person
+      ( PER_FIRST_NAME,
+      PER_LAST_NAME,
+      PER_BIRTH_DATE,
+      PER_WEIGHT_KG,
+      PER_HEIGHT_M)
+      values
+      (#FirstName#,#LastName#,#BirthDate#, #WeightInKilograms#, #HeightInMeters#)
+    </insert>
+
+    <update id="UpdatePerson"
+                   parameterclass="Person">
+      <![CDATA[ update Person set
+      PER_FIRST_NAME =#FirstName#,
+      PER_LAST_NAME =#LastName#,
+      PER_BIRTH_DATE =#BirthDate#,
+      PER_WEIGHT_KG=#WeightInKilograms#,
+      PER_HEIGHT_M=#HeightInMeters#
+      where
+      PER_ID = #Id#　]]>
+    </update>
+
+    <delete id="DeletePerson" parameterclass="Person">
+      delete from Person
+      where
+      PER_ID = #Id#
+    </delete>
+
+  </statements>
+</sqlMap>
